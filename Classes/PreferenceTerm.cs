@@ -1,12 +1,14 @@
 ﻿using System;
 
-namespace OpenAPE {
+namespace OpenAPE
+{
     /// <summary>
     /// The PreferenceTerm class.
     /// Contains a representation of a single preference term.
     /// </summary>
     [Serializable]
-    public class PreferenceTerm {
+    public class PreferenceTerm
+    {
         /// <summary>
         /// The key of this preference term.
         /// </summary>
@@ -36,7 +38,8 @@ namespace OpenAPE {
         /// </summary>
         /// <param name="key">The key that is used.</param>
         /// <param name="value">The value that is used.</param>
-        public PreferenceTerm (string key, string value) {
+        public PreferenceTerm(string key, string value)
+        {
             Key = key.Replace(_CommonTermBaseURI, "");
             Value = value;
         }
@@ -45,9 +48,9 @@ namespace OpenAPE {
         /// Returns a string representation of this preference term.
         /// </summary>
         /// <returns>A printable string.</returns>
-        public override string ToString () {
+        public override string ToString()
+        {
             return "{\"" + Key + "\" : \"" + Value + "\"}";
         }
     }
-
 }

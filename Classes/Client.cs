@@ -42,12 +42,10 @@ namespace OpenAPE
         /// Only checks whether the token should still be valid according to the expiration date.
         /// The server might still reject it for some other reason.
         /// </remarks>
-        internal bool IsValid 
-		{
-			get {
-				return (DateTime.Now - _created).TotalSeconds < Expiration;
-			}
-		}
+        internal bool IsValid
+        {
+            get { return (DateTime.Now - _created).TotalSeconds < Expiration; }
+        }
     }
 
     /// <summary>
@@ -82,7 +80,7 @@ namespace OpenAPE
         /// The list of preferences of this preference set.
         /// </summary>
         [JsonProperty("preferences")]
-        internal PreferenceTermsDictionary PreferenceTerms {get; set; }
+        internal PreferenceTermsDictionary PreferenceTerms { get; set; }
     }
 
 
@@ -93,7 +91,7 @@ namespace OpenAPE
     /// 
     /// <inheritdoc cref="Dictionary{TKey,TValue}"/>
     internal class PreferenceTermsDictionary : Dictionary<string, string>
-    {     
+    {
     }
 
     /// <summary>
