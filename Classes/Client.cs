@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 
 namespace OpenAPE
 {
-    using PreferenceTerm = KeyValuePair<string, string>;
-
     /// <summary>
     /// The LoginResponse class.
     /// Contains a representation of the response that is received from the server on login.
@@ -84,8 +82,9 @@ namespace OpenAPE
         /// The list of preferences of this preference set.
         /// </summary>
         [JsonProperty("preferences")]
-        internal PreferenceTerms PreferenceTerms { get; set; }
+        internal PreferenceTermsDictionary PreferenceTerms {get; set; }
     }
+
 
     /// <summary>
     /// The PreferenceTerms class.
@@ -93,10 +92,9 @@ namespace OpenAPE
     /// </summary>
     /// 
     /// <inheritdoc cref="Dictionary{TKey,TValue}"/>
-    public class PreferenceTerms : Dictionary<string, string>
-    {
+    internal class PreferenceTermsDictionary : Dictionary<string, string>
+    {     
     }
-
 
     /// <summary>
     /// The main Client class.
@@ -166,7 +164,7 @@ namespace OpenAPE
         /// <param name="id">The profile's id</param>
         /// <param name="preferenceTerms">The object where the preferenceTerms are stored in. May be null on error.</param>
         /// <returns>true, if the retrieval succeeded, else false.</returns>
-        public bool GetProfile(string id, out PreferenceTerms preferenceTerms)
+        internal bool GetProfile(string id, out PreferenceTerms preferenceTerms)
         {
             if (_loginResponse.Token == null)
             {
@@ -198,8 +196,7 @@ namespace OpenAPE
             }
 
             _userContextResponse = JsonConvert.DeserializeObject<UserContextResponse>(response.Content);
-
-            preferenceTerms = _userContextResponse.UserPreferences.PreferenceTerms;
+            preferenceTerms = new PreferenceTerms(_userContextResponse.UserPreferences.PreferenceTerms);
 
             return true;
         }

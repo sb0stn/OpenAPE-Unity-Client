@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenAPE;
+using System.Collections;
 
 namespace OpenAPE_C_ {
     class Program {
@@ -19,7 +20,7 @@ namespace OpenAPE_C_ {
             }
 
             // now we need to get a profile. For now, it suffices to retrieve the default profile.
-            var preferences = new PreferenceTerms ();
+            PreferenceTerms preferences;
             bool profileSuccess = client.GetProfile (persona.Id, out preferences);
 
             if (!profileSuccess) {
@@ -27,9 +28,9 @@ namespace OpenAPE_C_ {
                 return;
             }
 
-            // at this point we have successfully gotten the preferences, which are stores in a Dictionary<string, string> currently.
+            // at this point we have successfully gotten the preferences.
             Console.WriteLine (preferences);
-
+            Console.WriteLine (preferences.Get("auditoryOutLanguage"));
         }
     }
 }
