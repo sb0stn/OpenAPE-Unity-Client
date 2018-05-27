@@ -48,10 +48,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Client.cs" />
-    <Compile Include="Classes\Persona.cs" />
-    <Compile Include="Classes\PreferenceTerm.cs" />
-    <Compile Include="Classes\PreferenceTerms.cs" />
+    <Compile Include="Client.cs" />
+    <Compile Include="Persona.cs" />
+    <Compile Include="PreferenceTerm.cs" />
+    <Compile Include="PreferenceTerms.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

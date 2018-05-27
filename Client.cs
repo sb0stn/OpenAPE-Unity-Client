@@ -1,128 +1,121 @@
 ﻿using System;
 using System.Collections.Generic;
-using RestSharp;
 using Newtonsoft.Json;
-
+using RestSharp;
 
 namespace OpenAPE
 {
     /// <summary>
-    /// The LoginResponse class.
-    /// Contains a representation of the response that is received from the server on login.
+    ///     The LoginResponse class.
+    ///     Contains a representation of the response that is received from the server on login.
     /// </summary>
     internal class LoginResponse
     {
         /// <summary>
-        /// The token that was received.
+        ///     The exact time the reponse was received.
+        /// </summary>
+        /// <remarks>
+        ///     Used to calculate the expiration of the token
+        /// </remarks>
+        private readonly DateTime _created = DateTime.Now;
+
+        /// <summary>
+        ///     The token that was received.
         /// </summary>
         [JsonProperty("access_token")]
         internal string Token { get; set; }
 
         /// <summary>
-        /// The expiration of the token.
+        ///     The expiration of the token.
         /// </summary>
         /// <remarks>
-        /// In seconds since token creation. Use isValid to check for expiration.
+        ///     In seconds since token creation. Use isValid to check for expiration.
         /// </remarks>
         [JsonProperty("expires_in")]
         internal int Expiration { get; set; }
 
         /// <summary>
-        /// The exact time the reponse was received.
+        ///     Whether the token is still valid.
         /// </summary>
         /// <remarks>
-        /// Used to calculate the expiration of the token
+        ///     Only checks whether the token should still be valid according to the expiration date.
+        ///     The server might still reject it for some other reason.
         /// </remarks>
-        private readonly DateTime _created = DateTime.Now;
-
-        /// <summary>
-        /// Whether the token is still valid.
-        /// </summary>
-        /// <remarks>
-        /// Only checks whether the token should still be valid according to the expiration date.
-        /// The server might still reject it for some other reason.
-        /// </remarks>
-        internal bool IsValid 
-		{
-			get {
-				return (DateTime.Now - _created).TotalSeconds < Expiration;
-			}
-		}
+        internal bool IsValid => (DateTime.Now - _created).TotalSeconds < Expiration;
     }
 
     /// <summary>
-    /// The UserContextResponse class.
-    /// Contains a representation of the response that is received from the server on getting a user context.
+    ///     The UserContextResponse class.
+    ///     Contains a representation of the response that is received from the server on getting a user context.
     /// </summary>
     internal class UserContextResponse
     {
         /// <summary>
-        /// The default preferences in this profile.
+        ///     The default preferences in this profile.
         /// </summary>
         /// <remarks>
-        /// The others are currently ignored if present.
+        ///     The others are currently ignored if present.
         /// </remarks>
         [JsonProperty("default")]
         internal UserPreferences UserPreferences { get; set; }
     }
 
     /// <summary>
-    /// The UserPreferences class.
-    /// Contains the data of a specific preference set.
+    ///     The UserPreferences class.
+    ///     Contains the data of a specific preference set.
     /// </summary>
     internal class UserPreferences
     {
         /// <summary>
-        /// The human-readable name of this preference set.
+        ///     The human-readable name of this preference set.
         /// </summary>
         [JsonProperty("name")]
         internal string Name { get; set; }
 
         /// <summary>
-        /// The list of preferences of this preference set.
+        ///     The list of preferences of this preference set.
         /// </summary>
         [JsonProperty("preferences")]
-        internal PreferenceTermsDictionary PreferenceTerms {get; set; }
+        internal PreferenceTermsDictionary PreferenceTerms { get; set; }
     }
 
 
     /// <summary>
-    /// The PreferenceTerms class.
-    /// Contains a list of preferences.
+    ///     The PreferenceTerms class.
+    ///     Contains a list of preferences.
     /// </summary>
-    /// 
-    /// <inheritdoc cref="Dictionary{TKey,TValue}"/>
+    /// <inheritdoc cref="Dictionary{TKey,TValue}" />
     internal class PreferenceTermsDictionary : Dictionary<string, string>
-    {     
+    {
     }
 
     /// <summary>
-    /// The main Client class.
-    /// Is used to communicate with the OpenAPE server.
+    ///     The main Client class.
+    ///     Is used to communicate with the OpenAPE server.
     /// </summary>
     public class Client
     {
         /// <summary>
-        /// The latest response received.
+        ///     The base url of the server.
+        /// </summary>
+        private const string BaseUrl = "https://openape.gpii.eu/";
+
+        /// <summary>
+        ///     The latest response received.
         /// </summary>
         private LoginResponse _loginResponse;
 
         /// <summary>
-        /// The latest response received.
+        ///     The latest response received.
         /// </summary>
         private UserContextResponse _userContextResponse;
 
-        /// <summary>
-        /// The base url of the server.
-        /// </summary>
-        private const string BaseUrl = "https://openape.gpii.eu/";
-
 
         /// <summary>
-        /// Login with the given username and password.
+        ///     Login with the given username and password.
         /// </summary>
         /// <remarks>
-        /// You will need to do this before loading any profiles.
+        ///     You will need to do this before loading any profiles.
         /// </remarks>
         /// <param name="username">The username that is used.</param>
         /// <param name="password">The password that is used.</param>
@@ -155,11 +148,11 @@ namespace OpenAPE
         }
 
         /// <summary>
-        /// Retrieves the user profile with the given id. 
+        ///     Retrieves the user profile with the given id.
         /// </summary>
         /// <remarks>
-        /// You have to be logged in with a valid token and the user needs to have access to the supplied profile. This means
-        /// the user owns it or it is public.
+        ///     You have to be logged in with a valid token and the user needs to have access to the supplied profile. This means
+        ///     the user owns it or it is public.
         /// </remarks>
         /// <param name="id">The profile's id</param>
         /// <param name="preferenceTerms">The object where the preferenceTerms are stored in. May be null on error.</param>
