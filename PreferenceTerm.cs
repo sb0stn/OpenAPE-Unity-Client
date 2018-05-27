@@ -34,6 +34,7 @@ namespace OpenAPE
         /// <remark>
         ///     Contains the term URI, e.g. "http://registry.gpii.eu/common/"
         /// </remark>
+
         public string Key { get; }
 
         /// <summary>

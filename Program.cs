@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
 
 namespace OpenAPE
 {
@@ -37,17 +36,10 @@ namespace OpenAPE
             Console.WriteLine(preferences.Get("auditoryOutLanguage"));
 
             // testing serialization
-            var formatter = new BinaryFormatter();
-            Stream outStream = new FileStream("preferences.bin", FileMode.Create, FileAccess.Write, FileShare.None);
-            formatter.Serialize(outStream, preferences);
-            outStream.Close();
+            var serialized = JsonConvert.SerializeObject(preferences);
+            var prefs = JsonConvert.DeserializeObject<PreferenceTerms>(serialized);
 
-
-            Stream inStream = new FileStream("preferences.bin", FileMode.Open, FileAccess.Read, FileShare.None);
-            var results = (PreferenceTerms) formatter.Deserialize(inStream);
-            Console.WriteLine(results);
-            inStream.Close();
-            File.Delete("preferences.bin");
+            Console.WriteLine(prefs);
         }
     }
 }

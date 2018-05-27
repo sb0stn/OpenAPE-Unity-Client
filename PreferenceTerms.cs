@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace OpenAPE
 {
@@ -16,8 +17,18 @@ namespace OpenAPE
         /// <summary>
         ///     The dictionary containing the preference terms.
         /// </summary>
-        private readonly List<PreferenceTerm> _preferences;
+        [JsonProperty("preferences")] private readonly List<PreferenceTerm> _preferences;
 
+
+        /// <summary>
+        ///     Creates a preference terms list.
+        /// </summary>
+        /// <remarks>
+        ///     Should only be used by serialization!
+        /// </remarks>
+        public PreferenceTerms()
+        {
+        }
 
         /// <summary>
         ///     Creates a preference terms list with the given dictionary.
