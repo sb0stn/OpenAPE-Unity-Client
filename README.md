@@ -1,8 +1,3 @@
 # OpenApe-C-Sharp
 
-# Build
-~~~
-dotnet build
-~~~
-
-To use this copy the generated dll to your Unity project
+Just copy the files from the ```Classes``` folder to your project.
