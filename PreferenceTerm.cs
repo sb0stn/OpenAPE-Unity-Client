@@ -15,7 +15,7 @@ namespace OpenAPE
         /// <remarks>
         ///     This is used to simplify getting a specific preference.
         /// </remarks>
-        private const string _CommonTermBaseURI = "http://registry.gpii.eu/common/";
+        private const string CommonTermBaseUri = "http://registry.gpii.eu/common/";
 
         /// <summary>
         ///     Create a new preference term with the given key and value.
@@ -24,7 +24,7 @@ namespace OpenAPE
         /// <param name="value">The value that is used.</param>
         public PreferenceTerm(string key, string value)
         {
-            Key = key.Replace(_CommonTermBaseURI, "");
+            Key = key.Replace(CommonTermBaseUri, "");
             Value = value;
         }
 

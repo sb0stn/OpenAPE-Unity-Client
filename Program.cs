@@ -24,8 +24,7 @@ namespace OpenAPE
             }
 
             // now we need to get a profile. For now, it suffices to retrieve the default profile.
-            PreferenceTerms preferences;
-            var profileSuccess = client.GetProfile(persona.Id, out preferences);
+            var profileSuccess = client.GetProfile(persona.Id, out var preferences);
 
             if (!profileSuccess)
             {
