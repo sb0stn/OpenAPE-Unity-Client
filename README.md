@@ -1,3 +1,9 @@
 # OpenApe-C-Sharp
 
-Just copy the files from the ```Classes``` folder to your project.
+Just download the latest release and add the respective classes to your project. This project depends on:
+* RESTSharp
+* JSON.net
+
+Look at the Program.cs file for usage examples.
+
+
