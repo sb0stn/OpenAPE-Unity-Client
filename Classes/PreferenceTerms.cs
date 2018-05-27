@@ -9,6 +9,8 @@ namespace OpenAPE {
     /// <remarks>
     /// Currently only common terms are supported and used.
     /// </remarks>
+
+    [Serializable]
     class PreferenceTerms {
         /// <summary>
         /// The dictionary containing the preference terms.

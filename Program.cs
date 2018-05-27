@@ -1,6 +1,8 @@
 ﻿using System;
 using OpenAPE;
 using System.Collections;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace OpenAPE_C_ {
     class Program {
@@ -31,6 +33,19 @@ namespace OpenAPE_C_ {
             // at this point we have successfully gotten the preferences.
             Console.WriteLine (preferences);
             Console.WriteLine (preferences.Get("auditoryOutLanguage"));
+
+            // testing serialization
+            BinaryFormatter formatter = new BinaryFormatter();  
+            Stream outStream = new FileStream("preferences.bin", FileMode.Create, FileAccess.Write, FileShare.None);  
+            formatter.Serialize(outStream, preferences);  
+            outStream.Close();  
+
+            
+            Stream inStream = new FileStream("preferences.bin", FileMode.Open, FileAccess.Read, FileShare.None);  
+            PreferenceTerms results = (PreferenceTerms)formatter.Deserialize(inStream);
+            Console.WriteLine(results);
+            inStream.Close();
+            File.Delete("preferences.bin");
         }
     }
 }
