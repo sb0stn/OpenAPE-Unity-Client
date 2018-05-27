@@ -12,7 +12,7 @@ namespace OpenAPE
     ///     Currently only common terms are supported and used.
     /// </remarks>
     [Serializable]
-    internal class PreferenceTerms
+    public class PreferenceTerms
     {
         /// <summary>
         ///     The dictionary containing the preference terms.
