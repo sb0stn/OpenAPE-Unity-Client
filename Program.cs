@@ -4,7 +4,7 @@ using System.Collections;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace OpenAPE_C_ {
+namespace OpenAPE {
     class Program {
         static void Main (string[] args) {
             // getting the right persona, this can be Olaf, Mary or Hannes.

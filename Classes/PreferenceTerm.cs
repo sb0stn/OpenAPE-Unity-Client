@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 
 namespace OpenAPE {
     /// <summary>
     /// The PreferenceTerm class.
     /// Contains a representation of a single preference term.
     /// </summary>
-     [Serializable]
+    [Serializable]
     public class PreferenceTerm {
         /// <summary>
         /// The key of this preference term.
