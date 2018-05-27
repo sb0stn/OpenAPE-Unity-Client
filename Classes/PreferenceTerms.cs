@@ -46,7 +46,17 @@ namespace OpenAPE {
         /// </summary>
         /// <returns>A printable string.</returns>
         public override string ToString() {
-            return System.Environment.NewLine + string.Join(System.Environment.NewLine, _preferences);
+			// note: do not replace with string.Join(System.Environment.NewLine, _preferences) since Unity's .NET version
+			// does not seem to support it yet.
+
+			string retVal = "";
+
+			foreach (PreferenceTerm preferenceTerm in _preferences) {
+				retVal += preferenceTerm.ToString () + System.Environment.NewLine;
+			}
+
+			return retVal;
+				
         }
     }
 }
