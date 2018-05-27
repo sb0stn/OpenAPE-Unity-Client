@@ -1,23 +1,21 @@
 ﻿using System;
-using OpenAPE;
-using System.Collections;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace OpenAPE
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // getting the right persona, this can be Olaf, Mary or Hannes.
-            Persona persona = Persona.Olaf;
+            var persona = Persona.Olaf;
 
             // this class handles the communication with the server
-            Client client = new Client();
+            var client = new Client();
 
             // first we need to login to receive a token to authenticate with. This is valid for 1440s currently. 
-            bool loginSuccess = client.Login(persona.Username, persona.Password);
+            var loginSuccess = client.Login(persona.Username, persona.Password);
 
             if (!loginSuccess)
             {
@@ -27,7 +25,7 @@ namespace OpenAPE
 
             // now we need to get a profile. For now, it suffices to retrieve the default profile.
             PreferenceTerms preferences;
-            bool profileSuccess = client.GetProfile(persona.Id, out preferences);
+            var profileSuccess = client.GetProfile(persona.Id, out preferences);
 
             if (!profileSuccess)
             {
@@ -40,14 +38,14 @@ namespace OpenAPE
             Console.WriteLine(preferences.Get("auditoryOutLanguage"));
 
             // testing serialization
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             Stream outStream = new FileStream("preferences.bin", FileMode.Create, FileAccess.Write, FileShare.None);
             formatter.Serialize(outStream, preferences);
             outStream.Close();
 
 
             Stream inStream = new FileStream("preferences.bin", FileMode.Open, FileAccess.Read, FileShare.None);
-            PreferenceTerms results = (PreferenceTerms) formatter.Deserialize(inStream);
+            var results = (PreferenceTerms) formatter.Deserialize(inStream);
             Console.WriteLine(results);
             inStream.Close();
             File.Delete("preferences.bin");
