@@ -25,25 +25,63 @@ namespace OpenAPE
         public PreferenceTerm(string key, string value)
         {
             Key = key.Replace(CommonTermBaseUri, "");
+            Uri = CommonTermBaseUri;
             Value = value;
+            Type = TypeValue(Key);
+        }
+
+        private static dynamic TypeValue(string key)
+        {
+            switch (key)
+            {
+                case "language":
+                case "auditoryOutLanguage":
+                    return "string";
+
+                case "highContrastEnabled":
+                case "voiceControlEnabled":
+                    return "bool";
+
+                case "fontSize":
+                case "speechRate":
+                    return "short";
+
+                case "pitch":
+                case "volumeTTS":
+                    return "double";
+
+                default:
+                    Console.WriteLine("Unknown key: " + key);
+                    return "string";
+            }
         }
 
         /// <summary>
         ///     The key of this preference term.
         /// </summary>
-        /// <remark>
-        ///     Contains the term URI, e.g. "http://registry.gpii.eu/common/"
-        /// </remark>
-
         public string Key { get; }
+
+        /// <summary>
+        ///     The Uri of this preference term.
+        /// </summary>
+        /// <remark>
+        ///    E.g. "http://registry.gpii.eu/common/"
+        /// </remark>
+        public string Uri { get; }
 
         /// <summary>
         ///     The value of this preference term.
         /// </summary>
-        /// <remark>
-        ///     Currently is always a string. This will change soon!
-        /// </remark>
         public string Value { get; }
+
+        /// <summary>
+        ///     The type of this preference term.
+        /// </summary>
+        /// <remarks>
+        ///     Use this to parse the value. Unfortunately our .NET version does not support dynamic type.
+        /// </remarks>
+        public string Type { get; }
+
 
         /// <summary>
         ///     Returns a string representation of this preference term.
@@ -51,7 +89,7 @@ namespace OpenAPE
         /// <returns>A printable string.</returns>
         public override string ToString()
         {
-            return "{\"" + Key + "\" : \"" + Value + "\"}";
+            return "{\"" + Key + "\" : \"" + Value + "\" (" + Type + ")}";
         }
     }
 }
