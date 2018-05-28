@@ -85,7 +85,7 @@ namespace OpenAPE
     ///     Contains a list of preferences.
     /// </summary>
     /// <inheritdoc cref="Dictionary{TKey,TValue}" />
-    internal class PreferenceTermsDictionary : Dictionary<string, string>
+    public class PreferenceTermsDictionary : Dictionary<string, string>
     {
     }
 
