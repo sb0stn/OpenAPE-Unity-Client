@@ -230,6 +230,7 @@ namespace OpenAPE
             var request = new RestRequest(Method.PUT);
             request.AddHeader("content-type", "application/json");
             request.AddHeader("authorization", _loginResponse.Token);
+            request.AddBody(JsonConvert.SerializeObject(preferenceTerms));
 
             var response = client.Execute(request);
 
