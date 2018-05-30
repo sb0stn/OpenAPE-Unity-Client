@@ -5,9 +5,10 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
 using RestSharp;
+using UnityEngine;
 
 namespace OpenAPE
-{
+{   
     /// <summary>
     ///     The LoginResponse class.
     ///     Contains a representation of the response that is received from the server on login.
@@ -102,7 +103,7 @@ namespace OpenAPE
         ///     The base url of the server.
         /// </summary>
         private const string BaseUrl = "https://openape.gpii.eu/";
-
+        
         /// <summary>
         ///     The latest response received.
         /// </summary>
@@ -113,13 +114,17 @@ namespace OpenAPE
         /// </summary>
         private UserContextResponse _userContextResponse;
         
+
         /// <summary>
-        ///     Accept every certificate even if insecure
+        ///      Creates a new instance of the client.
         /// </summary>
-        private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors)
+        /// <remarks>
+        ///     Currently trusts ALL certificates!
+        /// </remarks>
+        public Client()
         {
-            // all Certificates are accepted
-            return true;
+            // all Certificates are accepted TODO check if we can replace this
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; ;   
         }
 
         /// <summary>
@@ -135,11 +140,9 @@ namespace OpenAPE
         {
             if (_loginResponse != null && _loginResponse.IsValid)
             {
-                Console.WriteLine("Login is still valid!");
+                Debug.Log("Login is still valid!");
                 return true;
             }
-            
-            ServicePointManager.ServerCertificateValidationCallback = TrustCertificate;
 
             var client = new RestClient(BaseUrl + "token");
 
@@ -151,7 +154,7 @@ namespace OpenAPE
             var response = client.Execute(request);
             if (response.ErrorException != null)
             {
-                Console.WriteLine("An error occured while logging in...");
+                Debug.Log("An error occured while logging in...");
                 return false;
             }
 
@@ -174,19 +177,17 @@ namespace OpenAPE
         {
             if (_loginResponse.Token == null)
             {
-                Console.WriteLine("You need to login first!");
+                Debug.Log("You need to login first!");
                 preferenceTerms = null;
                 return false;
             }
 
             if (!_loginResponse.IsValid)
             {
-                Console.WriteLine("Login has expired!");
+                Debug.Log("Login has expired!");
                 preferenceTerms = null;
                 return false;
             }
-            
-            ServicePointManager.ServerCertificateValidationCallback = TrustCertificate;
 
             var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
 
@@ -198,13 +199,44 @@ namespace OpenAPE
 
             if (response.ErrorException != null)
             {
-                Console.WriteLine("An error occured while getting user profile...");
+                Debug.Log("An error occured while getting user profile...");
                 preferenceTerms = null;
                 return false;
             }
 
             _userContextResponse = JsonConvert.DeserializeObject<UserContextResponse>(response.Content);
             preferenceTerms = new PreferenceTerms(_userContextResponse.UserPreferences.PreferenceTerms);
+
+            return true;
+        }
+
+        internal bool UpdateProfile(string id, PreferenceTerms preferenceTerms)
+        {
+            if (_loginResponse.Token == null)
+            {
+                Debug.Log("You need to login first!");
+                return false;
+            }
+
+            if (!_loginResponse.IsValid)
+            {
+                Debug.Log("Login has expired!");
+                return false;
+            }
+            
+            var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
+
+            var request = new RestRequest(Method.PUT);
+            request.AddHeader("content-type", "application/json");
+            request.AddHeader("authorization", _loginResponse.Token);
+            
+            var response = client.Execute(request);
+
+            if (response.ErrorException != null)
+            {
+                Debug.Log("An error occured while updating user profile...");
+                return false;
+            }
 
             return true;
         }

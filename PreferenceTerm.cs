@@ -30,7 +30,7 @@ namespace OpenAPE
             Type = TypeValue(Key);
         }
 
-        private static string TypeValue(string key)
+        private static dynamic TypeValue(string key)
         {
             switch (key)
             {
@@ -72,7 +72,7 @@ namespace OpenAPE
         /// <summary>
         ///     The value of this preference term.
         /// </summary>
-        public string Value { get; }
+        public string Value { get; set; }
 
         /// <summary>
         ///     The type of this preference term.

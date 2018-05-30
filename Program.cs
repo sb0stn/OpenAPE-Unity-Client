@@ -35,10 +35,13 @@ namespace OpenAPE
             Console.WriteLine(preferences);
             Console.WriteLine(preferences.Get("auditoryOutLanguage"));
 
-            // testing serialization
+            // changing the value of a preference term
+            preferences.Set("auditoryOutLanguage", "de-DE");
+            client.UpdateProfile(persona.Id, preferences);
+
+            // serialization
             var serialized = JsonConvert.SerializeObject(preferences);
             var prefs = JsonConvert.DeserializeObject<PreferenceTerms>(serialized);
-
             Console.WriteLine(prefs);
         }
     }

@@ -57,6 +57,24 @@ namespace OpenAPE
         }
 
         /// <summary>
+        ///     Sets a single preference term by its key.
+        /// </summary>
+        /// <param name="key">The key of the preference.</param>
+        /// <param name="value">The new value of the preference.</param>
+        /// <returns>The preference term or null if it was not found.</returns>
+        public PreferenceTerm Set(string key, string value)
+        {
+            PreferenceTerm preferenceTerm = Get("key");
+
+            if (preferenceTerm != null)
+            {
+                preferenceTerm.Value = value;
+            }
+
+            return preferenceTerm;
+        }
+        
+        /// <summary>
         ///     Returns a string representation of the preference terms.
         /// </summary>
         /// <returns>A printable string.</returns>
