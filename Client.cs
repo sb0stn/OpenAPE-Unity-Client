@@ -124,7 +124,7 @@ namespace OpenAPE
         public Client()
         {
             // all Certificates are accepted TODO check if we can replace this
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; ;   
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
         }
 
         /// <summary>
