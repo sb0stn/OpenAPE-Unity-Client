@@ -65,7 +65,7 @@ namespace OpenAPE
         /// <returns>The preference term or null if it was not found.</returns>
         public PreferenceTerm Set(string key, string value)
         {
-            var preferenceTerm = Get("key");
+            var preferenceTerm = Get(key);
 
             if (preferenceTerm != null)
             {
