@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -109,7 +112,15 @@ namespace OpenAPE
         ///     The latest response received.
         /// </summary>
         private UserContextResponse _userContextResponse;
-
+        
+        /// <summary>
+        ///     Accept every certificate even if insecure
+        /// </summary>
+        private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors)
+        {
+            // all Certificates are accepted
+            return true;
+        }
 
         /// <summary>
         ///     Login with the given username and password.
@@ -127,6 +138,8 @@ namespace OpenAPE
                 Console.WriteLine("Login is still valid!");
                 return true;
             }
+            
+            ServicePointManager.ServerCertificateValidationCallback = TrustCertificate;
 
             var client = new RestClient(BaseUrl + "token");
 
@@ -172,6 +185,8 @@ namespace OpenAPE
                 preferenceTerms = null;
                 return false;
             }
+            
+            ServicePointManager.ServerCertificateValidationCallback = TrustCertificate;
 
             var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
 
