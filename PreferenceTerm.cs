@@ -30,7 +30,7 @@ namespace OpenAPE
             Type = TypeValue(Key);
         }
 
-        private static dynamic TypeValue(string key)
+        private static string TypeValue(string key)
         {
             switch (key)
             {
