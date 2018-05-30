@@ -8,7 +8,7 @@ using RestSharp;
 using UnityEngine;
 
 namespace OpenAPE
-{   
+{
     /// <summary>
     ///     The LoginResponse class.
     ///     Contains a representation of the response that is received from the server on login.
@@ -103,7 +103,7 @@ namespace OpenAPE
         ///     The base url of the server.
         /// </summary>
         private const string BaseUrl = "https://openape.gpii.eu/";
-        
+
         /// <summary>
         ///     The latest response received.
         /// </summary>
@@ -113,7 +113,6 @@ namespace OpenAPE
         ///     The latest response received.
         /// </summary>
         private UserContextResponse _userContextResponse;
-        
 
         /// <summary>
         ///      Creates a new instance of the client.
@@ -155,6 +154,7 @@ namespace OpenAPE
             if (response.ErrorException != null)
             {
                 Debug.Log("An error occured while logging in...");
+                Debug.Log(response.ErrorMessage);
                 return false;
             }
 
@@ -200,6 +200,7 @@ namespace OpenAPE
             if (response.ErrorException != null)
             {
                 Debug.Log("An error occured while getting user profile...");
+                Debug.Log(response.ErrorMessage);
                 preferenceTerms = null;
                 return false;
             }
@@ -223,18 +224,19 @@ namespace OpenAPE
                 Debug.Log("Login has expired!");
                 return false;
             }
-            
+
             var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
 
             var request = new RestRequest(Method.PUT);
             request.AddHeader("content-type", "application/json");
             request.AddHeader("authorization", _loginResponse.Token);
-            
+
             var response = client.Execute(request);
 
             if (response.ErrorException != null)
             {
                 Debug.Log("An error occured while updating user profile...");
+                Debug.Log(response.ErrorMessage);
                 return false;
             }
 

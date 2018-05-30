@@ -41,6 +41,8 @@ namespace OpenAPE
 
             // serialization
             var serialized = JsonConvert.SerializeObject(preferences);
+            UnityEngine.Debug.Log(serialized);
+
             var prefs = JsonConvert.DeserializeObject<PreferenceTerms>(serialized);
             Console.WriteLine(prefs);
         }
