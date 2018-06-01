@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
 using RestSharp;
 using UnityEngine;
@@ -115,7 +113,7 @@ namespace OpenAPE
         private UserContextResponse _userContextResponse;
 
         /// <summary>
-        ///      Creates a new instance of the client.
+        ///     Creates a new instance of the client.
         /// </summary>
         /// <remarks>
         ///     Currently trusts ALL certificates!
@@ -123,7 +121,7 @@ namespace OpenAPE
         public Client()
         {
             // all Certificates are accepted TODO check if we can replace this
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
 
         /// <summary>

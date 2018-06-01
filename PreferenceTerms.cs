@@ -28,7 +28,6 @@ namespace OpenAPE
         /// </remarks>
         public PreferenceTerms()
         {
-            
         }
 
         /// <summary>
@@ -74,7 +73,7 @@ namespace OpenAPE
 
             return preferenceTerm;
         }
-        
+
         /// <summary>
         ///     Returns a string representation of the preference terms.
         /// </summary>

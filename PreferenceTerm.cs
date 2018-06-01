@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace OpenAPE
 {
@@ -18,7 +18,7 @@ namespace OpenAPE
         ///     This is used to simplify getting a specific preference.
         /// </remarks>
         private const string CommonTermBaseUri = "http://registry.gpii.eu/common/";
-        
+
         /// <summary>
         ///     The base URI for application terms.
         /// </summary>
@@ -35,7 +35,8 @@ namespace OpenAPE
         /// <param name="value">The value that is used.</param>
         /// <param name="uri">The uri that is used.</param>
         [JsonConstructor]
-        private PreferenceTerm(string key, string type, string value, string uri) {
+        private PreferenceTerm(string key, string type, string value, string uri)
+        {
             Key = key;
             Type = type;
             Value = value;
@@ -57,16 +58,42 @@ namespace OpenAPE
             else if (key.Contains(ApplicationTermBaseUri))
             {
                 Key = key.Replace(ApplicationTermBaseUri, "");
-                Uri = ApplicationTermBaseUri; 
+                Uri = ApplicationTermBaseUri;
             }
             else
             {
                 Debug.Log("Unknown preference term URI encountered in key: " + key);
             }
-            
+
             Value = value;
             Type = TypeValue(Key);
         }
+
+        /// <summary>
+        ///     The key of this preference term.
+        /// </summary>
+        public string Key { get; }
+
+        /// <summary>
+        ///     The Uri of this preference term.
+        /// </summary>
+        /// <remark>
+        ///     E.g. "http://registry.gpii.eu/common/"
+        /// </remark>
+        public string Uri { get; }
+
+        /// <summary>
+        ///     The value of this preference term.
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        ///     The type of this preference term.
+        /// </summary>
+        /// <remarks>
+        ///     Use this to parse the value. Unfortunately our .NET version does not support dynamic type.
+        /// </remarks>
+        public string Type { get; }
 
         private static string TypeValue(string key)
         {
@@ -93,32 +120,6 @@ namespace OpenAPE
                     return "string";
             }
         }
-
-        /// <summary>
-        ///     The key of this preference term.
-        /// </summary>
-        public string Key { get; }
-
-        /// <summary>
-        ///     The Uri of this preference term.
-        /// </summary>
-        /// <remark>
-        ///    E.g. "http://registry.gpii.eu/common/"
-        /// </remark>
-        public string Uri { get; }
-
-        /// <summary>
-        ///     The value of this preference term.
-        /// </summary>
-        public string Value { get; set; }
-
-        /// <summary>
-        ///     The type of this preference term.
-        /// </summary>
-        /// <remarks>
-        ///     Use this to parse the value. Unfortunately our .NET version does not support dynamic type.
-        /// </remarks>
-        public string Type { get; }
 
 
         /// <summary>
