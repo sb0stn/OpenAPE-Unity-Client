@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace OpenAPE
 {
@@ -91,6 +93,26 @@ namespace OpenAPE
     {
     }
 
+
+    /// <summary>
+    ///     The completion handler called when a response was reveived.
+    /// </summary>
+    /// <param name="response">The response text.</param>
+    internal delegate void OnResponseReceived(string response);
+
+    /// <summary>
+    ///     The completion handler called when an error occured was reveived.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    internal delegate void OnErrorReceived(string message);
+
+    /// <summary>
+    ///     The completion handler called when a rest call is completed.
+    /// </summary>
+    /// <param name="status">Whether or not the call succeeded.</param>
+    /// <param name="result">The resulting object. May be null on error or when no result is needed.</param>
+    public delegate void OnCompletion<T>(bool status, T result);
+
     /// <summary>
     ///     The main Client class.
     ///     Is used to communicate with the OpenAPE server.
@@ -113,13 +135,20 @@ namespace OpenAPE
         private UserContextResponse _userContextResponse;
 
         /// <summary>
+        /// The Parent context that can execute Coroutines.
+        /// </summary>
+        private ICoroutineExecutor _parent;
+
+        /// <summary>
         ///     Creates a new instance of the client.
         /// </summary>
         /// <remarks>
         ///     Currently trusts ALL certificates!
         /// </remarks>
-        public Client()
+        public Client(ICoroutineExecutor parent)
         {
+            _parent = parent;
+
             // all Certificates are accepted TODO check if we can replace this
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
@@ -129,37 +158,35 @@ namespace OpenAPE
         /// </summary>
         /// <remarks>
         ///     You will need to do this before loading any profiles.
+        ///     Also please note, that the result of this operation is always null!
         /// </remarks>
         /// <param name="username">The username that is used.</param>
         /// <param name="password">The password that is used.</param>
-        /// <returns>true, if the login succeeded, else false.</returns>
-        public bool Login(string username, string password)
+        /// <param name="onCompletion">The completion handler returns whether the login succeeded.</param>
+        public bool Login(string username, string password, OnCompletion<object> onCompletion)
         {
             if (_loginResponse != null && _loginResponse.IsValid)
             {
                 Debug.Log("Login is still valid!");
-                return true;
+                onCompletion(true, null);
+                return true; // TODO remove
             }
 
-            var client = new RestClient(BaseUrl + "token");
 
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            request.AddParameter("application/x-www-form-urlencoded",
-                "grant_type=password&username=" + username + "&password=" + password, ParameterType.RequestBody);
-
-            var response = client.Execute(request);
-            if (response.ErrorException != null)
+            _parent.StartChildCoroutine(_LoginCoroutine(username, password, response =>
+            {
+                _loginResponse = JsonConvert.DeserializeObject<LoginResponse>(response);
+                onCompletion(true, null);
+            }, message =>
             {
                 Debug.Log("An error occured while logging in...");
-                Debug.Log(response.ErrorMessage);
-                return false;
-            }
+                Debug.Log(message);
+                onCompletion(false, null);
+            }));
 
-            _loginResponse = JsonConvert.DeserializeObject<LoginResponse>(response.Content);
-
-            return true;
+            return true; // TODO remove
         }
+
 
         /// <summary>
         ///     Retrieves the user profile with the given id.
@@ -169,77 +196,162 @@ namespace OpenAPE
         ///     the user owns it or it is public.
         /// </remarks>
         /// <param name="id">The profile's id</param>
-        /// <param name="preferenceTerms">The object where the preferenceTerms are stored in. May be null on error.</param>
-        /// <returns>true, if the retrieval succeeded, else false.</returns>
-        internal bool GetProfile(string id, out PreferenceTerms preferenceTerms)
+        /// <param name="onCompletion">The completion handler returns whether the getting of the profile succeeded.
+        /// The result is where the preferenceTerms are stored in. May be null on error.</param>
+        internal bool GetProfile(string id, OnCompletion<PreferenceTerms> onCompletion)
         {
-            if (_loginResponse.Token == null)
+            if (_loginResponse?.Token == null)
             {
                 Debug.Log("You need to login first!");
-                preferenceTerms = null;
-                return false;
+                onCompletion(false, null);
+                return false; // TODO remove
             }
 
             if (!_loginResponse.IsValid)
             {
                 Debug.Log("Login has expired!");
-                preferenceTerms = null;
-                return false;
+                onCompletion(false, null);
+                return false; // TODO remove
             }
 
-            var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
+            _parent.StartChildCoroutine(_GetProfileCoroutine(id, response =>
+            {
+                _userContextResponse = JsonConvert.DeserializeObject<UserContextResponse>(response);
 
-            var request = new RestRequest(Method.GET);
-            request.AddHeader("content-type", "application/json");
-            request.AddHeader("authorization", _loginResponse.Token);
-
-            var response = client.Execute(request);
-
-            if (response.ErrorException != null)
+                onCompletion(true, new PreferenceTerms(_userContextResponse.UserPreferences.PreferenceTerms));
+            }, message =>
             {
                 Debug.Log("An error occured while getting user profile...");
-                Debug.Log(response.ErrorMessage);
-                preferenceTerms = null;
-                return false;
-            }
+                Debug.Log(message);
+                onCompletion(false, null);
+            }));
 
-            _userContextResponse = JsonConvert.DeserializeObject<UserContextResponse>(response.Content);
-            preferenceTerms = new PreferenceTerms(_userContextResponse.UserPreferences.PreferenceTerms);
-
-            return true;
+            return true; // TODO remove
         }
 
-        internal bool UpdateProfile(string id, PreferenceTerms preferenceTerms)
+        /// <summary>
+        ///     Updates the user profile with the given id.
+        /// </summary>
+        /// <param name="id">The profile's id</param>
+        /// <param name="preferenceTerms">The updated preference terms to save.</param>
+        /// <param name="onCompletion">The completion handler returns whether the update of the profile succeeded.</param>
+        internal bool UpdateProfile(string id, PreferenceTerms preferenceTerms, OnCompletion<object> onCompletion)
         {
-            if (_loginResponse.Token == null)
+            if (_loginResponse?.Token == null)
             {
                 Debug.Log("You need to login first!");
-                return false;
+                onCompletion(false, null);
+                return false; // TODO remove
             }
 
             if (!_loginResponse.IsValid)
             {
                 Debug.Log("Login has expired!");
-                return false;
+                onCompletion(false, null);
+                return false; // TODO remove
             }
 
-            var client = new RestClient(BaseUrl + "api/user-contexts/" + id);
-
-            var request = new RestRequest(Method.PUT);
-            request.AddHeader("content-type", "application/json");
-            request.AddHeader("authorization", _loginResponse.Token);
-            request.AddBody(JsonConvert.SerializeObject(preferenceTerms));
-
-            var response = client.Execute(request);
-
-            if (response.ErrorException != null)
+            _parent.StartChildCoroutine(_UpdateProfileCoroutine(id, preferenceTerms, response =>
+            {
+                onCompletion(true, null);
+            }, message =>
             {
                 Debug.Log("An error occured while updating user profile...");
-                Debug.Log(response.ErrorMessage);
-                return false;
-            }
+                Debug.Log(message);
+                onCompletion(false, null);
+            }));
 
-            return true;
+            return true; // TODO remove
+        }
+
+        
+        
+        /// <summary>
+        ///     Handles the login as a coroutine.
+        /// </summary>
+        /// <param name="username">The username that is used.</param>
+        /// <param name="password">The password that is used.</param>
+        /// <param name="onResponseReceived">The handler to call on success.</param>
+        /// <param name="onErrorReceived">The handler to call on error.</param>
+        /// <returns>An enumerator.</returns>
+        private IEnumerator _LoginCoroutine(string username, string password, OnResponseReceived onResponseReceived, OnErrorReceived onErrorReceived)
+        {
+            var form = new WWWForm();
+            form.AddField("grant_type", "password");
+            form.AddField("username", username);
+            form.AddField("password", password);
+
+
+            using (var req = UnityWebRequest.Post(BaseUrl + "token", form))
+            {
+                req.SetRequestHeader("grant_type", "application/x-www-form-urlencoded");
+                req.downloadHandler = new DownloadHandlerBuffer();
+                yield return req.SendWebRequest();
+
+                if (req.isNetworkError || req.isHttpError)
+                {
+                    onErrorReceived(req.error);
+                }
+                else
+                {
+                    onResponseReceived(req.downloadHandler.text);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Handles the getting of a profile as a coroutine.
+        /// </summary>
+        /// <param name="id">The profile's id</param>
+        /// <param name="onResponseReceived">The handler to call on success.</param>
+        /// <param name="onErrorReceived">The handler to call on error.</param>
+        /// <returns>An enumerator.</returns>
+        private IEnumerator _GetProfileCoroutine(string id, OnResponseReceived onResponseReceived, OnErrorReceived onErrorReceived)
+        {
+            using (var req = UnityWebRequest.Get(BaseUrl + "api/user-contexts/" + id))
+            {
+                req.SetRequestHeader("content-type", "application/json");
+                req.SetRequestHeader("authorization", _loginResponse.Token);
+                req.downloadHandler = new DownloadHandlerBuffer();
+                yield return req.SendWebRequest();
+
+                if (req.isNetworkError || req.isHttpError)
+                {
+                    onErrorReceived(req.error);
+                }
+                else
+                {
+                    onResponseReceived(req.downloadHandler.text);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Handles the updating of a profile as a coroutine.
+        /// </summary>
+        /// <param name="id">The profile's id</param>
+        /// <param name="preferenceTerms">The new and updated preference terms.</param>
+        /// <param name="onResponseReceived">The handler to call on success.</param>
+        /// <param name="onErrorReceived">The handler to call on error.</param>
+        /// <returns>An enumerator.</returns>
+        private IEnumerator _UpdateProfileCoroutine(string id, PreferenceTerms preferenceTerms, OnResponseReceived onResponseReceived, OnErrorReceived onErrorReceived)
+        {
+            using (var req = UnityWebRequest.Put(BaseUrl + "api/user-contexts/" + id, JsonConvert.SerializeObject(preferenceTerms)))
+            {
+                req.SetRequestHeader("content-type", "application/json");
+                req.SetRequestHeader("authorization", _loginResponse.Token);
+                req.downloadHandler = new DownloadHandlerBuffer();
+                yield return req.SendWebRequest();
+
+                if (req.isNetworkError || req.isHttpError)
+                {
+                    onErrorReceived(req.error);
+                }
+                else
+                {
+                    onResponseReceived(req.downloadHandler.text);
+                }
+            }
         }
     }
 }
