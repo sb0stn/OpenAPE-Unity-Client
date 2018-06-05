@@ -14,7 +14,7 @@ Look at the [Program.cs](Program.cs) file for a usage examples.
 
 
 # OpenAPE Doku
-Folgende Common Terms exisiteren prinzipiell schon: https://remexlabs.github.io/GTx_HDM1.2aX/gpii-common-terms.html
+Folgende Common Terms exisiteren prinzipiell schon: [Common Terms](https://remexlabs.github.io/GTx_HDM1.2aX/gpii-common-terms.html)
 
 ## Nutzer
 ### Olaf
