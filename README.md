@@ -1,17 +1,36 @@
 # OpenApe-C-Sharp
 
-Just add the following classes to your project:
+Just add the following classes and interfaces to your project:
 * [Client.cs](Client.cs)
 * [Persona.cs](Persona.cs)
 * [PreferenceTerm.cs](PreferenceTerm.cs)
 * [PreferenceTerms.cs](PreferenceTerms.cs)
+* [ICoroutineExecutor.cs](ICoroutineExecutor.cs)
 
 This project also depends on the following, which need to be added via nuget.
-* RESTSharp
 * JSON.net
 
-Look at the [Program.cs](Program.cs) file for a usage examples.
+You will need to call the methods on the Client class from a MonoBehavior inside a coroutine:
+```cs
+private IEnumerator LoginUser(string username, string password)
+{
+	yield return OpenApeClient.Login(username, password, (status, result) =>
+	{
+		if (status)
+		{
+			StartCoroutine(GetUserPreferences (Persona.Olaf.Id));
+		}
+	});
+}
+```
 
+Your caller needs to implement the ```ICoroutineExecutor``` interface and therefore must be a MonoBehavior:
+```cs
+public void StartChildCoroutine(IEnumerator coroutineMethod)
+{
+	StartCoroutine(coroutineMethod);
+}
+```
 
 # OpenAPE Doku
 Folgende Common Terms exisiteren prinzipiell schon: [Common Terms](https://remexlabs.github.io/GTx_HDM1.2aX/gpii-common-terms.html)
