@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
-using RestSharp;
 using UnityEngine;
 using UnityEngine.Networking;
 
