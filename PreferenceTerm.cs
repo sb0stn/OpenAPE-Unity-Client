@@ -37,7 +37,7 @@ namespace OpenAPE
         private PreferenceTerm(string key, string value, string uri)
         {
             Key = key;
-            Value = ConvertValue(key, value);
+            Value = value;
             Uri = uri;
         }
 
@@ -63,8 +63,7 @@ namespace OpenAPE
                 Debug.Log("Unknown preference term URI encountered in key: " + key);
             }
 
-            Value = ConvertValue(key, value);
-          
+            Value = value;
         }
 
         /// <summary>
@@ -83,51 +82,39 @@ namespace OpenAPE
         /// <summary>
         ///     The value of this preference term.
         /// </summary>
-        public dynamic Value { get; set; }
+        public string Value { set; get; }
 
 
-        private static dynamic ConvertValue(string key, string value)
+        public T GetValueTyped<T>()
         {
-            try
+            switch (Key)
             {
+                case "grayScale":
+                    return  (T) Convert.ChangeType(bool.Parse(Value), typeof(T));
 
-                switch (key)
-                {
-                    case "grayScale":
-                        return Boolean.Parse(value);
+                case "fontSize":
+                    return  (T) Convert.ChangeType(int.Parse(Value), typeof(T));
 
-                    case "fontSize":
-                        return short.Parse(value);
-                    
-                    case "iconLocation":
-                        switch (value)
-                        {
-                           case "NORMAL":
-                               return CircleButtonGroupManager.ViewType.NORMAL;
-                           
-                           case "RIGHT":
-                               return CircleButtonGroupManager.ViewType.RIGHT;
-                           
-                           case "TOPRIGHT":
-                               return CircleButtonGroupManager.ViewType.TOPRIGHT;
-                           
-                           default:
-                               Console.WriteLine("Unknown enum value: " + value);
-                               return value;
-                        }
+                case "volumeTTS":
+                    return  (T) Convert.ChangeType(float.Parse(Value), typeof(T));
 
-                    default:
-                        Console.WriteLine("Unknown key: " + key);
-                        return value;
-                }
+                case "iconLocation":
+                    switch (Value)
+                    {
+                        case "NORMAL":
+                            return  (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.NORMAL, typeof(T));
+
+                        case "RIGHT":
+                            return  (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.RIGHT, typeof(T));
+
+                        case "TOPRIGHT":
+                            return  (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.TOPRIGHT, typeof(T));
+                    }
+                    break;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Could not convert value: " + value);
-                return value;
-            }
+
+            return  (T) Convert.ChangeType(Value, typeof(T));;
         }
-
 
         /// <summary>
         ///     Returns a string representation of this preference term.
