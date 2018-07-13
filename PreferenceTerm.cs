@@ -25,21 +25,19 @@ namespace OpenAPE
         /// <remarks>
         ///     This is used to simplify getting a specific preference.
         /// </remarks>
-        private const string ApplicationTermBaseUri = "http://registry.gpii.net/applications/de.hdm.sh18/";
+        private const string ApplicationTermBaseUri = "http://registry.gpii.eu/sh2018ar/";
 
         /// <summary>
         ///     Create a new preference term from serialization.
         /// </summary>
         /// <param name="key">The key that is used.</param>
-        /// <param name="type">The type that is used.</param>
         /// <param name="value">The value that is used.</param>
         /// <param name="uri">The uri that is used.</param>
         [JsonConstructor]
-        private PreferenceTerm(string key, string type, string value, string uri)
+        private PreferenceTerm(string key, string value, string uri)
         {
             Key = key;
-            Type = type;
-            Value = value;
+            Value = ConvertValue(key, value);
             Uri = uri;
         }
 
@@ -65,8 +63,8 @@ namespace OpenAPE
                 Debug.Log("Unknown preference term URI encountered in key: " + key);
             }
 
-            Value = value;
-            Type = TypeValue(Key);
+            Value = ConvertValue(key, value);
+          
         }
 
         /// <summary>
@@ -85,39 +83,48 @@ namespace OpenAPE
         /// <summary>
         ///     The value of this preference term.
         /// </summary>
-        public string Value { get; set; }
+        public dynamic Value { get; set; }
 
-        /// <summary>
-        ///     The type of this preference term.
-        /// </summary>
-        /// <remarks>
-        ///     Use this to parse the value. Unfortunately our .NET version does not support dynamic type.
-        /// </remarks>
-        public string Type { get; }
 
-        private static string TypeValue(string key)
+        private static dynamic ConvertValue(string key, string value)
         {
-            switch (key)
+            try
             {
-                case "language":
-                case "auditoryOutLanguage":
-                    return "string";
 
-                case "highContrastEnabled":
-                case "voiceControlEnabled":
-                    return "bool";
+                switch (key)
+                {
+                    case "highContrastEnabled":
+                        return Boolean.Parse(value);
 
-                case "fontSize":
-                case "speechRate":
-                    return "short";
+                    case "fontSize":
+                        return short.Parse(value);
+                    
+                    case "iconLocation":
+                        switch (value)
+                        {
+                           case "NORMAL":
+                               return CircleButtonGroupManager.ViewType.NORMAL;
+                           
+                           case "RIGHT":
+                               return CircleButtonGroupManager.ViewType.RIGHT;
+                           
+                           case "TOPRIGHT":
+                               return CircleButtonGroupManager.ViewType.TOPRIGHT;
+                           
+                           default:
+                               Console.WriteLine("Unknown enum value: " + value);
+                               return value;
+                        }
 
-                case "pitch":
-                case "volumeTTS":
-                    return "double";
-
-                default:
-                    Console.WriteLine("Unknown key: " + key);
-                    return "string";
+                    default:
+                        Console.WriteLine("Unknown key: " + key);
+                        return value;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not convert value: " + value);
+                return value;
             }
         }
 
@@ -128,7 +135,7 @@ namespace OpenAPE
         /// <returns>A printable string.</returns>
         public override string ToString()
         {
-            return "{\"" + Uri + Key + "\" : \"" + Value + "\" (" + Type + ")}";
+            return "{\"" + Uri + Key + "\" : \"" + Value + "}";
         }
     }
 }
