@@ -99,12 +99,22 @@ namespace OpenAPE
                     case "fontSize":
                         return short.Parse(value);
                     
-                    case "volumeTTS":
-                        return float.Parse(value);
-                    
                     case "iconLocation":
-                        Enum.TryParse(value, out CircleButtonGroupManager.ViewType viewType);
-                        return viewType;
+                        switch (value)
+                        {
+                           case "NORMAL":
+                               return CircleButtonGroupManager.ViewType.NORMAL;
+                           
+                           case "RIGHT":
+                               return CircleButtonGroupManager.ViewType.RIGHT;
+                           
+                           case "TOPRIGHT":
+                               return CircleButtonGroupManager.ViewType.TOPRIGHT;
+                           
+                           default:
+                               Console.WriteLine("Unknown enum value: " + value);
+                               return value;
+                        }
 
                     default:
                         Console.WriteLine("Unknown key: " + key);
