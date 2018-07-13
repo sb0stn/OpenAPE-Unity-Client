@@ -99,6 +99,9 @@ namespace OpenAPE
                     case "fontSize":
                         return short.Parse(value);
                     
+                    case "volumeTTS":
+                        return float.Parse(value);
+                    
                     case "iconLocation":
                         Enum.TryParse(value, out CircleButtonGroupManager.ViewType viewType);
                         return viewType;
