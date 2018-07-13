@@ -1,9 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace OpenAPE
 {
+    public class TypeSwitch
+    {
+        Dictionary<Type, Action<object>> matches = new Dictionary<Type, Action<object>>();
+
+        public TypeSwitch Case<T>(Action<T> action)
+        {
+            matches.Add(typeof(T), (x) => action((T) x));
+            return this;
+        }
+
+        public void Switch(object x)
+        {
+            matches[x.GetType()](x);
+        }
+    }
+
     /// <summary>
     ///     The PreferenceTerm class.
     ///     Contains a representation of a single preference term.
@@ -37,7 +54,7 @@ namespace OpenAPE
         private PreferenceTerm(string key, string value, string uri)
         {
             Key = key;
-            Value = ConvertValue(key, value);
+            Value = value;
             Uri = uri;
         }
 
@@ -63,8 +80,7 @@ namespace OpenAPE
                 Debug.Log("Unknown preference term URI encountered in key: " + key);
             }
 
-            Value = ConvertValue(key, value);
-          
+            Value = value;
         }
 
         /// <summary>
@@ -83,51 +99,74 @@ namespace OpenAPE
         /// <summary>
         ///     The value of this preference term.
         /// </summary>
-        public dynamic Value { get; set; }
+        public string Value { set; get; }
 
 
-        private static dynamic ConvertValue(string key, string value)
+        /// <summary>
+        ///     The Type of this preference term.
+        /// </summary>
+        /// <returns>A Type, i.e. bool.</returns>
+        public Type GetTypeOfValue()
         {
-            try
+            switch (Key)
             {
+                case "grayScale":
+                    return typeof(bool);
 
-                switch (key)
-                {
-                    case "grayScale":
-                        return Boolean.Parse(value);
+                case "fontSize":
+                    return typeof(int);
 
-                    case "fontSize":
-                        return short.Parse(value);
-                    
-                    case "iconLocation":
-                        switch (value)
-                        {
-                           case "NORMAL":
-                               return CircleButtonGroupManager.ViewType.NORMAL;
-                           
-                           case "RIGHT":
-                               return CircleButtonGroupManager.ViewType.RIGHT;
-                           
-                           case "TOPRIGHT":
-                               return CircleButtonGroupManager.ViewType.TOPRIGHT;
-                           
-                           default:
-                               Console.WriteLine("Unknown enum value: " + value);
-                               return value;
-                        }
+                case "volumeTTS":
+                    return typeof(float);
 
-                    default:
-                        Console.WriteLine("Unknown key: " + key);
-                        return value;
-                }
+                case "iconLocation":
+                    return typeof(CircleButtonGroupManager.ViewType);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Could not convert value: " + value);
-                return value;
-            }
+
+            return typeof(string);
         }
 
+
+        /// <summary>
+        ///     The value of this preference term as a typed instance.
+        /// </summary>
+        /// <typeparam name="T">The expected type.</typeparam>
+        /// <remarks>You might want to use GetTypeOfValue() if you are not sure what type to expect.</remarks>
+        /// <returns>The value converted to T.</returns>
+        public T GetValueTyped<T>()
+        {
+            if (typeof(T) == typeof(bool))
+            {
+                return (T) Convert.ChangeType(bool.Parse(Value), typeof(T));
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return (T) Convert.ChangeType(int.Parse(Value), typeof(T));
+            }
+
+            if (typeof(T) == typeof(float))
+            {
+                return (T) Convert.ChangeType(float.Parse(Value), typeof(T));
+            }
+
+            if (typeof(T) == typeof(CircleButtonGroupManager.ViewType))
+            {
+                switch (Value)
+                {
+                    case "NORMAL":
+                        return (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.NORMAL, typeof(T));
+
+                    case "RIGHT":
+                        return (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.RIGHT, typeof(T));
+
+                    case "TOPRIGHT":
+                        return (T) Convert.ChangeType(CircleButtonGroupManager.ViewType.TOPRIGHT, typeof(T));
+                }
+            }
+
+            return (T) Convert.ChangeType(Value, typeof(T));
+        }
 
         /// <summary>
         ///     Returns a string representation of this preference term.
