@@ -93,7 +93,7 @@ namespace OpenAPE
 
                 switch (key)
                 {
-                    case "highContrastEnabled":
+                    case "grayScale":
                         return Boolean.Parse(value);
 
                     case "fontSize":
