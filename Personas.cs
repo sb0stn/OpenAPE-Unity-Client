@@ -32,7 +32,12 @@ namespace OpenAPE
 
         public Persona Get(int idx)
         {
-            return personas[idx];
+            if (idx < personas.Count)
+            {
+                return personas[idx];
+            }
+
+            return null;
         }
         
         public List<Persona> GetAll()
