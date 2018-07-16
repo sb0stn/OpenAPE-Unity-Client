@@ -1,13 +1,38 @@
-﻿namespace OpenAPE
+﻿using System.Xml;
+using System.Collections.Generic;
+
+namespace OpenAPE
 {
     public class Persona
     {
-        public static readonly Persona Olaf = new Persona("sh18_olaf", "sh18demoolaf", "5ad9f7a438f55331474ccdf4");
-        public static readonly Persona Mary = new Persona("sh18_mary", "sh18demomary", "5ad9f74c38f55331474ccdf0");
-        public static readonly Persona Hannes = new Persona("sh18_hannes", "sh18demohannes", "5ad9f77138f55331474ccdf2");
         public readonly string Id;
         public readonly string Password;
         public readonly string Username;
+
+        private static Dictionary<string, Persona> personas;
+
+
+        public static void InitWithConfig(string path)
+        {
+            var doc = new XmlDocument();
+            doc.Load(path);
+
+            foreach (XmlNode node in doc.DocumentElement.SelectNodes("/personas/persona"))
+            {
+                var persona = new Persona(
+                    node.SelectSingleNode("/name").InnerText,
+                    node.SelectSingleNode("/password").InnerText,
+                    node.SelectSingleNode("/id").InnerText
+                    ); 
+
+                    personas.Add(persona.Username, persona);
+            }
+        }
+
+        public static Dictionary<string, Persona> GetPersonas()
+        {
+            return personas;
+        }
 
         private Persona(string username, string password, string id)
         {

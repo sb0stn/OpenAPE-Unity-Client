@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<personas>
+    <persona>
+        <name>Mary</name>
+        <user>sh18_mary</user>
+        <password>sh18demomary</password>
+        <id>5ad9f74c38f55331474ccdf0</id>
+    </persona>
+
+    <persona>
+        <name>Olaf</name>
+        <user>sh18_olaf</user>
+        <password>sh18demoolaf</password>
+        <id>5ad9f7a438f55331474ccdf4</id>
+    </persona>
+
+    <persona>
+        <name>Hannes</name>
+        <user>sh18_hannes</user>
+        <password>sh18demohannes</password>
+        <id>5ad9f77138f55331474ccdf2</id>
+    </persona>
+</personas>
