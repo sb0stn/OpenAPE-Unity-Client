@@ -21,6 +21,7 @@ namespace OpenAPE
             {                
                 var persona = new Persona(
                     node.SelectSingleNode("name").InnerText,
+                    node.SelectSingleNode("user").InnerText,
                     node.SelectSingleNode("password").InnerText,
                     node.SelectSingleNode("id").InnerText
                 ); 
@@ -49,12 +50,14 @@ namespace OpenAPE
     
     public class Persona
     {
-        public readonly string Id;
-        public readonly string Password;
+        public readonly string Name;
         public readonly string Username;
+        public readonly string Password;
+        public readonly string Id;
 
-        internal Persona(string username, string password, string id)
+        internal Persona(string name, string username, string password, string id)
         {
+            Name = name;
             Username = username;
             Password = password;
             Id = id;
