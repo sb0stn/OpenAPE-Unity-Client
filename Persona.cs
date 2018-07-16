@@ -9,7 +9,7 @@ namespace OpenAPE
         public readonly string Password;
         public readonly string Username;
 
-        private static Dictionary<string, Persona> personas;
+        private static List<Persona> personas;
 
 
         public static void InitWithConfig(string path)
@@ -25,11 +25,11 @@ namespace OpenAPE
                     node.SelectSingleNode("/id").InnerText
                     ); 
 
-                    personas.Add(persona.Username, persona);
+                    personas.Add(persona);
             }
         }
 
-        public static Dictionary<string, Persona> GetPersonas()
+        public static List<Persona> GetPersonas()
         {
             return personas;
         }
