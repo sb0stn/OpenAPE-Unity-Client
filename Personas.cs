@@ -1,5 +1,5 @@
-﻿using System.Xml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace OpenAPE
 {
@@ -8,26 +8,9 @@ namespace OpenAPE
         private static List<Persona> personas;
 
 
-        public Personas(string xml)
-        {         
-            var doc = new XmlDocument();
-            doc.LoadXml(xml);
-
-            var nodes = doc.DocumentElement.SelectNodes("/personas/persona");
-
-            personas = new List<Persona>(nodes.Count);
-            
-            foreach (XmlNode node in nodes)
-            {                
-                var persona = new Persona(
-                    node.SelectSingleNode("name").InnerText,
-                    node.SelectSingleNode("user").InnerText,
-                    node.SelectSingleNode("password").InnerText,
-                    node.SelectSingleNode("id").InnerText
-                ); 
-
-                personas.Add(persona);
-            }
+        public Personas(string json)
+        {
+            personas = JsonConvert.DeserializeObject<List<Persona>>(json);
         }
 
 
@@ -40,20 +23,27 @@ namespace OpenAPE
 
             return null;
         }
-        
+
         public List<Persona> GetAll()
         {
             return personas;
         }
     }
-    
-    
+
+
     public class Persona
     {
-        public readonly string Name;
-        public readonly string Username;
-        public readonly string Password;
-        public readonly string Id;
+        [JsonProperty("name")] public readonly string Name;
+
+        [JsonProperty("user")] public readonly string Username;
+
+        [JsonProperty("password")] public readonly string Password;
+
+        [JsonProperty("id")] public readonly string Id;
+
+        internal Persona()
+        {
+        }
 
         internal Persona(string name, string username, string password, string id)
         {
