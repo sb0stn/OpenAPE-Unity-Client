@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
 
 namespace OpenAPE
 {
+    [Serializable]
     public class Personas
     {
         private static List<Persona> personas;
@@ -30,7 +32,7 @@ namespace OpenAPE
         }
     }
 
-
+    [Serializable]
     public class Persona
     {
         [JsonProperty("name")] public readonly string Name;
