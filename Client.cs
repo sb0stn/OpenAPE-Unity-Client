@@ -129,6 +129,11 @@ namespace OpenAPE
         private LoginResponse _loginResponse;
 
         /// <summary>
+        ///     The user which was last logged in.
+        /// </summary>
+        private String _loggedInUser;
+
+        /// <summary>
         ///     The latest response received.
         /// </summary>
         private UserContextResponse _userContextResponse;
@@ -164,17 +169,25 @@ namespace OpenAPE
         /// <param name="onCompletion">The completion handler returns whether the login succeeded.</param>
         public bool Login(string username, string password, OnCompletion<object> onCompletion)
         {
-            if (_loginResponse != null && _loginResponse.IsValid)
+            if (username == null || username.Equals("") || password == null || password.Equals(""))
+            {
+                Debug.Log("Please supply all expected parameters");
+                onCompletion(false, null);
+                return false;
+            }
+
+            if ((_loggedInUser != null && username.Equals(_loggedInUser)) &&
+                (_loginResponse != null && _loginResponse.IsValid))
             {
                 Debug.Log("Login is still valid!");
                 onCompletion(true, null);
                 return true; // TODO remove
             }
 
-
             _parent.StartChildCoroutine(_LoginCoroutine(username, password, response =>
             {
                 _loginResponse = JsonConvert.DeserializeObject<LoginResponse>(response);
+                _loggedInUser = username;
                 onCompletion(true, null);
             }, message =>
             {
@@ -199,6 +212,13 @@ namespace OpenAPE
         /// The result is where the preferenceTerms are stored in. May be null on error.</param>
         internal bool GetProfile(string id, OnCompletion<PreferenceTerms> onCompletion)
         {
+            if (id == null || id.Equals(""))
+            {
+                Debug.Log("Please supply all expected parameters");
+                onCompletion(false, null);
+                return false;
+            }
+
             if (_loginResponse?.Token == null)
             {
                 Debug.Log("You need to login first!");
@@ -221,6 +241,7 @@ namespace OpenAPE
             }, message =>
             {
                 Debug.Log("An error occured while getting user profile...");
+                Debug.Log("Are you sure you are logged in with the right user? " + _loggedInUser + " is logged in.");
                 Debug.Log(message);
                 onCompletion(false, null);
             }));
