@@ -139,7 +139,7 @@ namespace OpenAPE
         /// <summary>
         ///     The root certificate for OpenAPE
         /// </summary>
-        private const string RootCert = "Assets/OpenAPE/letsencrypt.crt";
+        //  private const string RootCert = Assets/OpenAPE/letsencrypt.crt";
 
         /// <summary>
         ///     The latest response received.
@@ -175,6 +175,11 @@ namespace OpenAPE
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(_AcceptAllCertifications);
             ServicePointManager.CertificatePolicy = new NoCheckCertificatePolicy();
             ServicePointManager.CheckCertificateRevocationList = false;
+
+            using (X509Store store = new X509Store(StoreName.Root, StoreLocation.CurrentUser)) {
+                store.Open(OpenFlags.ReadWrite);
+                store.Add(new X509Certificate2(X509Certificate2.CreateFromCertFile(Application.persistentDataPath + "/letsencrypt.crt")));
+            }
         }
 
         private static bool _AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification,
