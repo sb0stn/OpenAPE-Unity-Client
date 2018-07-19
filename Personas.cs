@@ -10,8 +10,7 @@ namespace OpenAPE
 
         public Personas(string json)
         {
-            var result = JsonConvert.DeserializeObject<List<Persona>>(json);
-            personas = result.Where( p => p.Enabled).ToList();
+            personas = JsonConvert.DeserializeObject<List<Persona>>(json);
         }
 
 
@@ -42,19 +41,16 @@ namespace OpenAPE
 
         [JsonProperty("id")] public readonly string Id;
 
-        [JsonProperty("enabled")] public readonly bool Enabled;
-
         internal Persona()
         {
         }
 
-        internal Persona(string name, string username, string password, string id, bool enabled)
+        internal Persona(string name, string username, string password, string id)
         {
             Name = name;
             Username = username;
             Password = password;
             Id = id;
-            Enabled = enabled;
         }
     }
 }
