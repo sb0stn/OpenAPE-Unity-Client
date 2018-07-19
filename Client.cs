@@ -5,9 +5,22 @@ using System.Net;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Security.Cryptography.X509Certificates;
 
 namespace OpenAPE
 {
+    /// <summary>
+    ///     The NoCheckCertificatePolicy class.
+    ///     Contains a definiton that should cause all certs to be trusted.
+    /// </summary>
+    class NoCheckCertificatePolicy : ICertificatePolicy
+    {
+        public bool CheckValidationResult(ServicePoint srvPoint, X509Certificate certificate, WebRequest request, int certificateProblem)
+        {
+            return true;
+        }
+    }
+
     /// <summary>
     ///     The LoginResponse class.
     ///     Contains a representation of the response that is received from the server on login.
@@ -158,13 +171,16 @@ namespace OpenAPE
         {
             _parent = parent;
 
-            // all Certificates are accepted TODO check if we can replace this
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            // all certificates and errors are accepted for now. So https is kinda pointless, but it seems the old Android vesion does not trust Let's Encrypt...
+            ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(_AcceptAllCertifications);
+            ServicePointManager.CertificatePolicy = new NoCheckCertificatePolicy();
+            ServicePointManager.CheckCertificateRevocationList = false;
+        }
 
-            using (X509Store store = new X509Store(StoreName.Root, StoreLocation.CurrentUser)) {
-                store.Open(OpenFlags.ReadWrite);
-                store.Add(new X509Certificate2(X509Certificate2.CreateFromCertFile(RootCert)));
-            }
+        private static bool _AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification,
+            System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
 
         /// <summary>
@@ -281,10 +297,7 @@ namespace OpenAPE
                 return false; // TODO remove
             }
 
-            _parent.StartChildCoroutine(_UpdateProfileCoroutine(id, preferenceTerms, response =>
-            {
-                onCompletion(true, null);
-            }, message =>
+            _parent.StartChildCoroutine(_UpdateProfileCoroutine(id, preferenceTerms, response => { onCompletion(true, null); }, message =>
             {
                 Debug.Log("An error occured while updating user profile...");
                 Debug.Log(message);
@@ -294,8 +307,7 @@ namespace OpenAPE
             return true; // TODO remove
         }
 
-        
-        
+
         /// <summary>
         ///     Handles the login as a coroutine.
         /// </summary>
