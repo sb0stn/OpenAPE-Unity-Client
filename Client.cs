@@ -134,7 +134,7 @@ namespace OpenAPE
         /// <summary>
         ///     The base url of the server.
         /// </summary>
-        private const string BaseUrl = "https://openape.gpii.eu/";
+        private string BaseUrl;
 
         /// <summary>
         ///     The root certificate for OpenAPE
@@ -170,6 +170,7 @@ namespace OpenAPE
         public Client(ICoroutineExecutor parent)
         {
             _parent = parent;
+            BaseUrl = System.IO.File.ReadAllText(Application.persistentDataPath + "OpenAPEServer.txt");
 
             // all certificates and errors are accepted for now. So https is kinda pointless, but it seems the old Android vesion does not trust Let's Encrypt...
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(_AcceptAllCertifications);
