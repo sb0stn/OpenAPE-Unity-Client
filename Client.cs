@@ -172,9 +172,9 @@ namespace OpenAPE
             _parent = parent;
 
             #if UNITY_EDITOR
-                BaseUrl = File.ReadAllText(Application.dataPath + "/Resources/OpenAPEServer.txt");
+                BaseUrl = System.IO.File.ReadAllText(Application.dataPath + "/Resources/OpenAPEServer.txt");
             #else
-                BaseUrl = File.ReadAllText(Application.persistentDataPath + "/OpenAPEServer.txt");
+                BaseUrl = System.IO.File.ReadAllText(Application.persistentDataPath + "/OpenAPEServer.txt");
             #endif
 
             // all certificates and errors are accepted for now. So https is kinda pointless, but it seems the old Android vesion does not trust Let's Encrypt...
