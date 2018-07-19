@@ -5,6 +5,7 @@ using System.Net;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Security.Cryptography.X509Certificates;
 
 namespace OpenAPE
 {
@@ -124,6 +125,11 @@ namespace OpenAPE
         private const string BaseUrl = "https://openape.gpii.eu/";
 
         /// <summary>
+        ///     The root certificate for OpenAPE
+        /// </summary>
+        private const string RootCert = "Assets/OpenAPE/letsencrypt.crt";
+
+        /// <summary>
         ///     The latest response received.
         /// </summary>
         private LoginResponse _loginResponse;
@@ -155,6 +161,11 @@ namespace OpenAPE
 
             // all Certificates are accepted TODO check if we can replace this
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+            using (X509Store store = new X509Store(StoreName.Root, StoreLocation.CurrentUser)) {
+                store.Open(OpenFlags.ReadWrite);
+                store.Add(new X509Certificate2(X509Certificate2.CreateFromCertFile(RootCert)));
+            }
         }
 
         /// <summary>
