@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace OpenAPE
 {
@@ -176,6 +177,9 @@ namespace OpenAPE
             #else
                 BaseUrl = System.IO.File.ReadAllText(Application.persistentDataPath + "/OpenAPEServer.txt");
             #endif
+
+            // Replacing new line character if we accidently read one
+            BaseUrl = Regex.Replace(BaseUrl, @"\t|\n|\r", String.Empty);
 
             // all certificates and errors are accepted for now. So https is kinda pointless, but it seems the old Android vesion does not trust Let's Encrypt...
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(_AcceptAllCertifications);
