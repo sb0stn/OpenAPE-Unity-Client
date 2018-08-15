@@ -148,19 +148,23 @@ namespace OpenAPE
         ///     Creates a new instance of the client.
         /// </summary>
         /// <remarks>
-        ///     Currently trusts ALL certificates!
+        ///     The server config is loaded from a text file just containing the target.
+        ///     This enables changing the server on device without recompiling the Unity app.
         /// </remarks>
-        public Client(ICoroutineExecutor parent)
+        /// <param name="serverConfigPath">The server that is used.</param>
+        public Client(ICoroutineExecutor parent, string serverConfigPath = null)
         {
             _parent = parent;
 
-            #if UNITY_EDITOR
-                BaseUrl = System.IO.File.ReadAllText(Application.dataPath + "/Resources/OpenAPEServer.txt");
-            #else
-                BaseUrl = System.IO.File.ReadAllText(Application.persistentDataPath + "/OpenAPEServer.txt");
-            #endif
+            // using either supplied path or a default path depending on the runtime context.
+            var path = serverConfigPath ??
+                #if UNITY_EDITOR
+                    Application.dataPath + "/Resources/OpenAPEServer.txt";
+                #else
+                    Application.persistentDataPath + "/OpenAPEServer.txt";
+                #endif
 
-            // Replacing new line character if we accidently read one
+            // Replacing new line character if we accidently read one.
             BaseUrl = Regex.Replace(BaseUrl, @"\t|\n|\r", String.Empty);
         }
 
