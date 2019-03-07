@@ -1,6 +1,6 @@
 # OpenAPE Unity (C#)
 
-This project implements basic OpenAPE features for Unity in C#. 
+This project implements basic OpenAPE (https://openape.gpii.eu/) features for Unity in C#. 
 
 The client implements the following methods:
 * Login
